@@ -44,6 +44,9 @@ stringData:
           certificate-authority-data: {{ b64enc .Values.agent.kubeconfig.caCrt }}
           insecure-skip-tls-verify: false
           server: {{ .Values.agent.kubeconfig.server }}
+          {{- if .Values.agent.kubeconfig.proxyUrl }}
+          proxy-url: {{ .Values.agent.kubeconfig.proxyUrl }}
+          {{- end }}
         name: {{ $name }}-apiserver
     users:
       - user:

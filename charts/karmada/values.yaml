@@ -697,6 +697,8 @@ agent:
   clusterEndpoint: ""
   ## kubeconfig of the karmada
   kubeconfig:
+    ## @param agent.kubeconfig.proxyUrl proxy of karmada api server 
+    proxyUrl: ""
     ## @param agent.kubeconfig.caCrt ca of the certificate
     caCrt: |
       -----BEGIN CERTIFICATE-----
