@@ -102,7 +102,7 @@ type RuleWithCluster struct {
 // - LabelsOverrider
 // - AnnotationsOverrider
 // - Plaintext
-// - PlaintextObjectOverrider 
+// - PlaintextObjectOverrider
 type Overriders struct {
 	// Plaintext represents override rules defined with plaintext overriders.
 	// +optional

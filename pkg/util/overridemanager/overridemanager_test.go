@@ -492,9 +492,9 @@ key:
 												Path: "data.test\\.yaml",
 												Plaintext: []policyv1alpha1.PlaintextOverrider{
 													{
-														Path: "/key/key1",
+														Path:     "/key/key1",
 														Operator: policyv1alpha1.OverriderOpReplace,
-											    	Value: apiextensionsv1.JSON{Raw:[]byte(`"updated_value"`)},
+														Value:    apiextensionsv1.JSON{Raw: []byte(`"updated_value"`)},
 													},
 												},
 											},
@@ -518,20 +518,20 @@ key:
 						PolicyName: "test1",
 						Overriders: policyv1alpha1.Overriders{
 							PlaintextObjectOverrider: []policyv1alpha1.PlaintextObjectOverrider{
-							{
-								Path: "data.test\\.yaml",
-								Plaintext: []policyv1alpha1.PlaintextOverrider{
-									{
-										Path: "/key/key1",
-										Operator: policyv1alpha1.OverriderOpReplace,
-										Value: apiextensionsv1.JSON{Raw:[]byte(`"updated_value"`)},
+								{
+									Path: "data.test\\.yaml",
+									Plaintext: []policyv1alpha1.PlaintextOverrider{
+										{
+											Path:     "/key/key1",
+											Operator: policyv1alpha1.OverriderOpReplace,
+											Value:    apiextensionsv1.JSON{Raw: []byte(`"updated_value"`)},
+										},
 									},
 								},
 							},
 						},
 					},
 				},
-			 },
 			},
 			wantErr: false,
 		},
@@ -564,7 +564,6 @@ key:
 		})
 	}
 }
-
 
 func Test_overrideManagerImpl_ApplyJSONOverridePolicies(t *testing.T) {
 	configmap := helper.NewConfigMap(metav1.NamespaceDefault, "test1", map[string]string{
@@ -612,9 +611,9 @@ func Test_overrideManagerImpl_ApplyJSONOverridePolicies(t *testing.T) {
 												Path: "data.test\\.yaml",
 												Plaintext: []policyv1alpha1.PlaintextOverrider{
 													{
-														Path: "/key/key1",
+														Path:     "/key/key1",
 														Operator: policyv1alpha1.OverriderOpReplace,
-											    	Value: apiextensionsv1.JSON{Raw:[]byte(`"updated_value"`)},
+														Value:    apiextensionsv1.JSON{Raw: []byte(`"updated_value"`)},
 													},
 												},
 											},
@@ -638,20 +637,20 @@ func Test_overrideManagerImpl_ApplyJSONOverridePolicies(t *testing.T) {
 						PolicyName: "test1",
 						Overriders: policyv1alpha1.Overriders{
 							PlaintextObjectOverrider: []policyv1alpha1.PlaintextObjectOverrider{
-							{
-								Path: "data.test\\.yaml",
-								Plaintext: []policyv1alpha1.PlaintextOverrider{
-									{
-										Path: "/key/key1",
-										Operator: policyv1alpha1.OverriderOpReplace,
-										Value: apiextensionsv1.JSON{Raw:[]byte(`"updated_value"`)},
+								{
+									Path: "data.test\\.yaml",
+									Plaintext: []policyv1alpha1.PlaintextOverrider{
+										{
+											Path:     "/key/key1",
+											Operator: policyv1alpha1.OverriderOpReplace,
+											Value:    apiextensionsv1.JSON{Raw: []byte(`"updated_value"`)},
+										},
 									},
 								},
 							},
 						},
 					},
 				},
-			 },
 			},
 			wantErr: false,
 		},
@@ -682,5 +681,3 @@ func Test_overrideManagerImpl_ApplyJSONOverridePolicies(t *testing.T) {
 		})
 	}
 }
-
-
