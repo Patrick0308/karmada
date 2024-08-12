@@ -272,17 +272,19 @@ spec:
                             - path
                             type: object
                           type: array
-                        yamlOverrider:
-                          description: YamlOverrider represents the rules dedicated
-                            to handling yaml data overrides
+                        plaintextObjectOverrider:
+                          description: PlaintextObjectOverrider represents the rules
+                            dedicated to handling yaml or json object overrides
                           items:
+                            description: PlaintextObjectOverrider represents the rules
+                              dedicated to handling yaml or json object overrides
                             properties:
                               path:
                                 description: Path indicates the path of target field
                                 type: string
-                              subOverrider:
-                                description: SubOverriders represents override rules
-                                  defined with plaintext overriders.
+                              plaintext:
+                                description: Plaintext represents override rules defined
+                                  with plaintext overriders.
                                 items:
                                   description: |-
                                     PlaintextOverrider is a simple overrider that overrides target fields
@@ -313,7 +315,7 @@ spec:
                                 type: array
                             required:
                             - path
-                            - subOverrider
+                            - plaintext
                             type: object
                           type: array
                       type: object
@@ -652,16 +654,18 @@ spec:
                       - path
                       type: object
                     type: array
-                  yamlOverrider:
-                    description: YamlOverrider represents the rules dedicated to handling
-                      yaml data overrides
+                  plaintextObjectOverrider:
+                    description: PlaintextObjectOverrider represents the rules dedicated
+                      to handling yaml or json object overrides
                     items:
+                      description: PlaintextObjectOverrider represents the rules dedicated
+                        to handling yaml or json object overrides
                       properties:
                         path:
                           description: Path indicates the path of target field
                           type: string
-                        subOverrider:
-                          description: SubOverriders represents override rules defined
+                        plaintext:
+                          description: Plaintext represents override rules defined
                             with plaintext overriders.
                           items:
                             description: |-
@@ -692,7 +696,7 @@ spec:
                           type: array
                       required:
                       - path
-                      - subOverrider
+                      - plaintext
                       type: object
                     type: array
                 type: object
