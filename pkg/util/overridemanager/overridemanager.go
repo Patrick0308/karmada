@@ -33,6 +33,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	"github.com/go-openapi/jsonpointer"
+
 	clusterv1alpha1 "github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
 	policyv1alpha1 "github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
 	"github.com/karmada-io/karmada/pkg/events"
@@ -409,13 +410,13 @@ func applyPlaintextObjectOverriders(rawObj *unstructured.Unstructured, plaintext
 				return err
 			}
 		}
-	  
+
 		_, err = pointer.Set(rawObj.Object, string(appliedRawData))
 		if err != nil {
 			return err
 		}
 	}
-	return nil 
+	return nil
 }
 
 func parseJSONPatchesByPlaintext(overriders []policyv1alpha1.PlaintextOverrider) []overrideOption {
