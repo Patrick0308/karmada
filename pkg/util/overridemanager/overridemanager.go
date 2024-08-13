@@ -393,14 +393,14 @@ func applyPlaintextObjectOverriders(rawObj *unstructured.Unstructured, plaintext
 		if kind != reflect.String {
 			errMsg := fmt.Sprintf("Get object's value by overrider's path(%s) is not string", plaintextObjectOverriders[index].Path)
 			klog.Errorf(errMsg)
-			return  fmt.Errorf(errMsg)
+			return fmt.Errorf(errMsg)
 		}
 		dataBytes := []byte(res.(string))
 		isJSON := yamlutil.IsJSONBuffer(dataBytes)
 		if !isJSON {
 			dataBytes, err = yaml.YAMLToJSON(dataBytes)
 			if err != nil {
-			  klog.Errorf("Before apply jsonpath by plaintextObjectOverriders[%d], parsing yaml to json err: %v", index, err)
+				klog.Errorf("Before apply jsonpath by plaintextObjectOverriders[%d], parsing yaml to json err: %v", index, err)
 				return err
 			}
 		}
@@ -412,7 +412,7 @@ func applyPlaintextObjectOverriders(rawObj *unstructured.Unstructured, plaintext
 		if !isJSON {
 			appliedRawData, err = yaml.JSONToYAML(appliedRawData)
 			if err != nil {
-			  klog.Errorf("After apply jsonpath by plaintextObjectOverriders[%d], parsing json to yaml err: %v", index, err)
+				klog.Errorf("After apply jsonpath by plaintextObjectOverriders[%d], parsing json to yaml err: %v", index, err)
 				return err
 			}
 		}
