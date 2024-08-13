@@ -19,7 +19,7 @@ package overridemanager
 import (
 	"context"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"reflect"
 	"sort"
 
@@ -382,23 +382,29 @@ func applyPlaintextObjectOverriders(rawObj *unstructured.Unstructured, plaintext
 	for index := range plaintextObjectOverriders {
 		pointer, err := jsonpointer.New(plaintextObjectOverriders[index].Path)
 		if err != nil {
+			klog.Errorf("Build jsonpointer with overrider's path err: %v", err)
 			return err
 		}
 		res, kind, err := pointer.Get(rawObj.Object)
 		if err != nil {
+			klog.Errorf("Get value by overrider's path err: %v", err)
 			return err
 		}
 		if kind != reflect.String {
-			return errors.New("path's value should be string")
+			errMsg := fmt.Sprintf("Get object's value by jsonpointer path(%s) is not string", plaintextObjectOverriders[index].Path)
+			klog.Errorf(errMsg)
+			return  fmt.Errorf(errMsg)
 		}
 		dataBytes := []byte(res.(string))
 		isJSON := yamlutil.IsJSONBuffer(dataBytes)
 		if !isJSON {
 			dataBytes, err = yaml.YAMLToJSON(dataBytes)
 			if err != nil {
+			  klog.Errorf("Before apply jsonpath by plaintextObjectOverriders[%d], parsing yaml to json err: %v", index, err)
 				return err
 			}
 		}
+		klog.V(4).Infof("Parsed JSON patches by plaintextObjectOverriders[%d](%+v)", index, plaintextObjectOverriders[index])
 		appliedRawData, err := applyRawJSONPatch(dataBytes, parseJSONPatchesByPlaintext(plaintextObjectOverriders[index].Plaintext))
 		if err != nil {
 			return err
@@ -406,10 +412,10 @@ func applyPlaintextObjectOverriders(rawObj *unstructured.Unstructured, plaintext
 		if !isJSON {
 			appliedRawData, err = yaml.JSONToYAML(appliedRawData)
 			if err != nil {
+			  klog.Errorf("After apply jsonpath by plaintextObjectOverriders[%d], parsing json to yaml err: %v", index, err)
 				return err
 			}
 		}
-
 		_, err = pointer.Set(rawObj.Object, string(appliedRawData))
 		if err != nil {
 			return err
