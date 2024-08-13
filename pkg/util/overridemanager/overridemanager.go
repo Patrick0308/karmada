@@ -391,7 +391,7 @@ func applyPlaintextObjectOverriders(rawObj *unstructured.Unstructured, plaintext
 			return err
 		}
 		if kind != reflect.String {
-			errMsg := fmt.Sprintf("Get object's value by jsonpointer path(%s) is not string", plaintextObjectOverriders[index].Path)
+			errMsg := fmt.Sprintf("Get object's value by overrider's path(%s) is not string", plaintextObjectOverriders[index].Path)
 			klog.Errorf(errMsg)
 			return  fmt.Errorf(errMsg)
 		}
