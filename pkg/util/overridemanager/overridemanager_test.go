@@ -553,7 +553,7 @@ key:
 			if !reflect.DeepEqual(gotOP, tt.wantOP) {
 				t.Errorf("ApplyOverridePolicies() gotOP = %v, wantOP %v", gotOP, tt.wantOP)
 			}
-			wantData := map[string]string{
+			wantData := map[string]interface{}{
 				"test.yaml": `key:
   key1: updated_value
 `,
@@ -567,7 +567,7 @@ key:
 
 func Test_overrideManagerImpl_ApplyJSONOverridePolicies(t *testing.T) {
 	configmap := helper.NewConfigMap(metav1.NamespaceDefault, "test1", map[string]string{
-		"test.yaml": `{"key":{"key1":"value"}`,
+		"test.json": `{"key":{"key1":"value"}}`,
 	})
 	configmapObj, _ := utilhelper.ToUnstructured(configmap)
 
@@ -608,7 +608,7 @@ func Test_overrideManagerImpl_ApplyJSONOverridePolicies(t *testing.T) {
 									Overriders: policyv1alpha1.Overriders{
 										PlaintextObjectOverrider: []policyv1alpha1.PlaintextObjectOverrider{
 											{
-												Path: "data.test\\.yaml",
+												Path: "data.test\\.json",
 												Plaintext: []policyv1alpha1.PlaintextOverrider{
 													{
 														Path:     "/key/key1",
@@ -638,7 +638,7 @@ func Test_overrideManagerImpl_ApplyJSONOverridePolicies(t *testing.T) {
 						Overriders: policyv1alpha1.Overriders{
 							PlaintextObjectOverrider: []policyv1alpha1.PlaintextObjectOverrider{
 								{
-									Path: "data.test\\.yaml",
+									Path: "data.test\\.json",
 									Plaintext: []policyv1alpha1.PlaintextOverrider{
 										{
 											Path:     "/key/key1",
@@ -672,8 +672,8 @@ func Test_overrideManagerImpl_ApplyJSONOverridePolicies(t *testing.T) {
 			if !reflect.DeepEqual(gotOP, tt.wantOP) {
 				t.Errorf("ApplyOverridePolicies() gotOP = %v, wantOP %v", gotOP, tt.wantOP)
 			}
-			wantData := map[string]string{
-				"test.yaml": `{"key":{"key1":"updated_value"}`,
+			wantData := map[string]interface{}{
+				"test.json": `{"key":{"key1":"updated_value"}}`,
 			}
 			if !reflect.DeepEqual(tt.args.rawObj.Object["data"], wantData) {
 				t.Errorf("ApplyOverridePolicies() gotData = %v, wantData %v", tt.args.rawObj.Object["data"], wantData)
