@@ -19,11 +19,11 @@ package overridemanager
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"reflect"
 	"sort"
 
 	jsonpatch "github.com/evanphx/json-patch/v5"
-	"github.com/tidwall/gjson"
-	"github.com/tidwall/sjson"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	yamlutil "k8s.io/apimachinery/pkg/util/yaml"
@@ -32,6 +32,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
 
+	"github.com/go-openapi/jsonpointer"
 	clusterv1alpha1 "github.com/karmada-io/karmada/pkg/apis/cluster/v1alpha1"
 	policyv1alpha1 "github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1"
 	"github.com/karmada-io/karmada/pkg/events"
@@ -290,7 +291,6 @@ func applyRawJSONPatch(raw []byte, overrides []overrideOption) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Printf(string(jsonPatchBytes) + " " + string(raw))
 
 	patch, err := jsonpatch.DecodePatch(jsonPatchBytes)
 	if err != nil {
@@ -379,13 +379,19 @@ func applyPlaintextObjectOverriders(rawObj *unstructured.Unstructured, plaintext
 	if len(plaintextObjectOverriders) == 0 {
 		return nil
 	}
-	rawObjJSONBytes, err := rawObj.MarshalJSON()
-	if err != nil {
-		return err
-	}
 	for index := range plaintextObjectOverriders {
-		res := gjson.GetBytes(rawObjJSONBytes, plaintextObjectOverriders[index].Path)
-		dataBytes := []byte(res.String())
+		pointer, err := jsonpointer.New(plaintextObjectOverriders[index].Path)
+		if err != nil {
+			return err
+		}
+		res, kind, err := pointer.Get(rawObj.Object)
+		if err != nil {
+			return err
+		}
+		if kind != reflect.String {
+			return errors.New("path's value should be string")
+		}
+		dataBytes := []byte(res.(string))
 		isJSON := yamlutil.IsJSONBuffer(dataBytes)
 		if !isJSON {
 			dataBytes, err = yaml.YAMLToJSON(dataBytes)
@@ -403,12 +409,13 @@ func applyPlaintextObjectOverriders(rawObj *unstructured.Unstructured, plaintext
 				return err
 			}
 		}
-		rawObjJSONBytes, err = sjson.SetBytes(rawObjJSONBytes, plaintextObjectOverriders[index].Path, appliedRawData)
+	  
+		_, err = pointer.Set(rawObj.Object, string(appliedRawData))
 		if err != nil {
 			return err
 		}
 	}
-	return rawObj.UnmarshalJSON(rawObjJSONBytes)
+	return nil 
 }
 
 func parseJSONPatchesByPlaintext(overriders []policyv1alpha1.PlaintextOverrider) []overrideOption {

@@ -489,7 +489,7 @@ key:
 									Overriders: policyv1alpha1.Overriders{
 										PlaintextObjectOverrider: []policyv1alpha1.PlaintextObjectOverrider{
 											{
-												Path: "data.test\\.yaml",
+												Path: "/data/test.yaml",
 												Plaintext: []policyv1alpha1.PlaintextOverrider{
 													{
 														Path:     "/key/key1",
@@ -519,7 +519,7 @@ key:
 						Overriders: policyv1alpha1.Overriders{
 							PlaintextObjectOverrider: []policyv1alpha1.PlaintextObjectOverrider{
 								{
-									Path: "data.test\\.yaml",
+									Path: "/data/test.yaml",
 									Plaintext: []policyv1alpha1.PlaintextOverrider{
 										{
 											Path:     "/key/key1",
@@ -608,7 +608,7 @@ func Test_overrideManagerImpl_ApplyJSONOverridePolicies(t *testing.T) {
 									Overriders: policyv1alpha1.Overriders{
 										PlaintextObjectOverrider: []policyv1alpha1.PlaintextObjectOverrider{
 											{
-												Path: "data.test\\.json",
+												Path: "/data/test.json",
 												Plaintext: []policyv1alpha1.PlaintextOverrider{
 													{
 														Path:     "/key/key1",
@@ -638,7 +638,7 @@ func Test_overrideManagerImpl_ApplyJSONOverridePolicies(t *testing.T) {
 						Overriders: policyv1alpha1.Overriders{
 							PlaintextObjectOverrider: []policyv1alpha1.PlaintextObjectOverrider{
 								{
-									Path: "data.test\\.json",
+									Path: "/data/test.json",
 									Plaintext: []policyv1alpha1.PlaintextOverrider{
 										{
 											Path:     "/key/key1",
