@@ -117,6 +117,13 @@ postDeleteJob:
   ## Define policies that determine when to delete corresponding hook resources: before-hook-creation,hook-succeeded,hook-failed
   hookDeletePolicy: "hook-succeeded"
 
+## post-upgrade job config
+postUpgradeJob:
+  tolerations: []
+  nodeSelector: {}
+  ## Define policies that determine when to delete corresponding hook resources: before-hook-creation,hook-succeeded,hook-failed
+  hookDeletePolicy: "hook-succeeded"
+
 ## karmada certificate config
 certs:
   ## @param certs.mode "auto" and "custom" are provided

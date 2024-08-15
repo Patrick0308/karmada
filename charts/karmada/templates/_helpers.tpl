@@ -110,6 +110,10 @@ app: {{- include "karmada.name" .}}-kube-controller-manager
 {{- end }}
 {{- end -}}
 
+{{- define "karmada.postUpgradeJob.labels" -}}
+{{- include "karmada.commonLabels" . -}}
+{{- end -}}
+
 {{- define "karmada.kubeconfig.volume" -}}
 {{- $name := include "karmada.name" . -}}
 - name: kubeconfig-secret
