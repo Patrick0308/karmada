@@ -111,6 +111,9 @@ spec:
             {{- if .Values.agent.clusterEndpoint }}
             - --cluster-api-endpoint={{ .Values.agent.clusterEndpoint }}
             {{- end }}
+            {{- if .Values.agent.proxyAddress }}
+            - --proxy-server-address={{ .Values.agent.proxyAddress }}
+            {{- end }}
             - --cluster-status-update-frequency=10s
             - --leader-elect-resource-namespace={{ include "karmada.namespace" . }}
             - --health-probe-bind-address=0.0.0.0:10357

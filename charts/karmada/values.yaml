@@ -697,6 +697,8 @@ agent:
   clusterName: ""
   ## @param agent.clusterEndpoint server endpoint of the member cluster
   clusterEndpoint: ""
+  ## @param agent.proxyAddress proxy of member cluster api server
+  proxyAddress: ""
   ## kubeconfig of the karmada
   kubeconfig:
     ## @param agent.kubeconfig.proxyUrl proxy of api server 
