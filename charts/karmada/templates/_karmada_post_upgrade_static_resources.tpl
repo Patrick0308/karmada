@@ -1,130 +1,99 @@
-{{- $name := include "karmada.name" . -}}
-{{- $namespace := include "karmada.namespace" . -}}
-{{- if eq .Values.installMode "host" }}
-apiVersion: batch/v1
-kind: Job
+{{- define "karmada.post-upgrade.configuration" -}}
+---
+apiVersion: config.karmada.io/v1alpha1
+kind: ResourceInterpreterCustomization
 metadata:
-  name: "{{ $name }}-post-upgrade"
-  namespace: {{ $namespace }}
-  annotations:
-    # This is what defines this resource as a hook. Without this line, the
-    # job is considered part of the release.
-    "helm.sh/hook": post-upgrade
-    "helm.sh/hook-weight": "3"
-    "helm.sh/hook-delete-policy": {{ .Values.postUpgradeJob.hookDeletePolicy }}
-  {{- if "karmada.postUpgradeJob.labels" }}
-  labels:
-    {{- include "karmada.postUpgradeJob.labels" . | nindent 4 }}
-  {{- end }}
+  name: karmada-preset-mutatingwebhookconfiguration
 spec:
-  parallelism: 1
-  completions: 1
-  template:
-    metadata:
-      name: {{ $name }}-post-upgrade
-      labels:
-        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
-        app.kubernetes.io/instance: {{ $name | quote }}
-        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    spec:
-      {{- with .Values.postUpgradeJob.tolerations}}
-      tolerations:
-      {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.postUpgradeJob.nodeSelector }}
-      nodeSelector:
-      {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ $name }}-post-upgrade
-      restartPolicy: Never
-      containers:
-      - name: post-upgrade
-        image: {{ template "karmada.kubectl.image" . }}
-        imagePullPolicy: {{ .Values.kubectl.image.pullPolicy }}
-        workingDir: /opt/mount
-        command:
-        - /bin/sh
-        - -c
-        - |
-          bash <<'EOF'
-          set -ex
-          kubectl apply -f /static-resources --kubeconfig /etc/kubeconfig
-          EOF
-        volumeMounts:
-        - name: {{ $name }}-upgrade-static-resources
-          mountPath: /static-resources
-        {{ include "karmada.kubeconfig.volumeMount" . | nindent 8 }}
-      volumes:
-      - name: {{ $name }}-upgrade-static-resources
-        configMap:
-          name: {{ $name }}-upgrade-static-resources
-      {{ include "karmada.kubeconfig.volume" . | nindent 6 }}
+  target:
+    apiVersion: admissionregistration.k8s.io/v1
+    kind: MutatingWebhookConfiguration
+  customizations:
+    retention:
+      luaScript: >
+        function Retain(desiredObj, observedObj)
+          local desiredLength = #desiredObj.webhooks
+          local observedLength = #observedObj.webhooks
+          if desiredLength <= 0 or observedLength <= 0 then
+            return desiredObj
+          end
+          for i = 1, math.min(desiredLength, observedLength) do
+             if desiredObj.webhooks[i].clientConfig.caBundle == nil then
+               desiredObj.webhooks[i].clientConfig.caBundle = observedObj.webhooks[i].clientConfig.caBundle
+             end
+          end
+          return desiredObj
+        end
 ---
-apiVersion: v1
-kind: ServiceAccount
+apiVersion: config.karmada.io/v1alpha1
+kind: ResourceInterpreterCustomization
 metadata:
-  name: {{ $name }}-post-upgrade
-  namespace: {{ $namespace }}
-  annotations:
-    "helm.sh/hook": post-upgrade
-    "helm.sh/hook-weight": "1"
-  {{- if "karmada.postUpgradeJob.labels" }}
-  labels:
-    {{- include "karmada.postUpgradeJob.labels" . | nindent 4 }}
-  {{- end }}
+  name: karmada-preset-deployment
+spec:
+  target:
+    apiVersion: apps/v1
+    kind: Deployment
+  customizations:
+    retention:
+      luaScript: >
+        function Retain(desiredObj, observedObj)
+          -- 处理 restartAt annotation 支持 kubectl rollout restart 
+          desiredObj.spec.template.metadata.annotations["kubectl.kubernetes.io/restartedAt"] = observedObj.spec.template.metadata.annotations["kubectl.kubernetes.io/restartedAt"]
+          -- 处理 reloader environment variables
+          desiredObj.spec.template.metadata.annotations["reloader.stakater.com/last-reloaded-from"] = observedObj.spec.template.metadata.annotations["reloader.stakater.com/last-reloaded-from"]
+          if observedObj.spec.template.spec.containers ~= nil then
+            for i, obsContainer in ipairs(observedObj.spec.template.spec.containers) do
+              if obsContainer.env ~= nil then
+                for _, env in ipairs(obsContainer.env) do
+                  if string.find(env.name, "^STAKATER") then
+                    -- 查找对应的 desiredObj container
+                    if desiredObj.spec.template.spec.containers[i] ~= nil then
+                      if desiredObj.spec.template.spec.containers[i].env == nil then
+                        desiredObj.spec.template.spec.containers[i].env = {}
+                      end
+                      -- 添加或更新 env 变量
+                      local found = false
+                      for _, dEnv in ipairs(desiredObj.spec.template.spec.containers[i].env) do
+                        if dEnv.name == env.name then
+                          dEnv.value = env.value
+                          found = true
+                          break
+                        end
+                      end
+                      if not found then
+                        table.insert(desiredObj.spec.template.spec.containers[i].env, env)
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+          return desiredObj
+        end
 ---
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+apiVersion: config.karmada.io/v1alpha1
+kind: ResourceInterpreterCustomization
 metadata:
-  name: {{ $name }}-post-upgrade
-  annotations:
-    "helm.sh/hook": post-upgrade
-    "helm.sh/hook-weight": "1"
-  {{- if "karmada.postUpgradeJob.labels" }}
-  labels:
-    {{- include "karmada.postUpgradeJob.labels" . | nindent 4 }}
-  {{- end }}
-rules:
-  - apiGroups: ['*']
-    resources: ['*']
-    verbs: ["get", "watch", "list", "create", "update", "patch", "delete"]
-  - nonResourceURLs: ['*']
-    verbs: ["get"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: {{ $name }}-post-upgrade
-  annotations:
-    "helm.sh/hook": post-upgrade
-    "helm.sh/hook-weight": "1"
-  {{- if "karmada.postUpgradeJob.labels" }}
-  labels:
-    {{- include "karmada.postUpgradeJob.labels" . | nindent 4 }}
-  {{- end }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: {{ $name }}-post-upgrade
-subjects:
-  - kind: ServiceAccount
-    name: {{ $name }}-post-upgrade
-    namespace: {{ $namespace }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ $name }}-upgrade-static-resources
-  namespace: {{ $namespace }}
-  annotations:
-    "helm.sh/hook": post-upgrade
-    "helm.sh/hook-weight": "1"
-  {{- if "karmada.postUpgradeJob.labels" }}
-  labels:
-    {{- include "karmada.postUpgradeJob.labels" . | nindent 4 }}
-  {{- end }}
-data:
-  {{- print "static-resources.yaml: " | nindent 6 }} |-
-    {{- include "karmada.post-upgrade.configuration" . | nindent 8 }}
----
-{{- end }}
+  name: karmada-preset-validatingwebhookconfiguration
+spec:
+  target:
+    apiVersion: admissionregistration.k8s.io/v1
+    kind: ValidatingWebhookConfiguration
+  customizations:
+    retention:
+      luaScript: >
+        function Retain(desiredObj, observedObj)
+          local desiredLength = #desiredObj.webhooks
+          local observedLength = #observedObj.webhooks
+          if desiredLength <= 0 or observedLength <= 0 then
+            return desiredObj
+          end
+          for i = 1, math.min(desiredLength, observedLength) do
+             if desiredObj.webhooks[i].clientConfig.caBundle == nil then
+               desiredObj.webhooks[i].clientConfig.caBundle = observedObj.webhooks[i].clientConfig.caBundle
+             end
+          end
+          return desiredObj
+        end
+{{- end -}}
