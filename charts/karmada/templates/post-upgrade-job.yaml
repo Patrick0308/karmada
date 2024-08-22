@@ -27,6 +27,7 @@ spec:
         app.kubernetes.io/instance: {{ $name | quote }}
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     spec:
+      {{- include "karmada.kubectl.imagePullSecrets" . | nindent 6 }}
       {{- with .Values.postUpgradeJob.tolerations}}
       tolerations:
       {{- toYaml . | nindent 8 }}

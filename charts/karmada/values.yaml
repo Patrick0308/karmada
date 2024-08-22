@@ -23,7 +23,7 @@ global:
 ## See https://yaml.org/spec/1.2/spec.html#id2765878 and
 ## https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_advanced_syntax.html#yaml-anchors-and-aliases-sharing-variable-values
 ## for more details about yaml anchors and aliases.
-karmadaImageVersion: &karmadaImageVersion latest
+karmadaImageVersion: &karmadaImageVersion hk-v1.9.1-lb-3-g83d085116-dirty
 
 ## Specify the imagePullPolicy of karmada images
 ## Defaults to 'IfNotPresent', you can set to 'Always' in cases of special needs
@@ -74,6 +74,13 @@ kubectl:
     tag: latest
     ## Specify a imagePullPolicy, defaults to 'IfNotPresent'
     pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## Example:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
 
 ## pre-install job config
 preInstallJob:

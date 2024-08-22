@@ -531,6 +531,13 @@ Return the proper karmada kubectl image name
 {{ include "common.images.image" (dict "imageRoot" .Values.kubectl.image "global" .Values.global) }}
 {{- end -}}
 
+{{/*
+Return the proper karmada kubectl and cfssl image pullSecrets
+*/}}
+{{- define "karmada.kubectl.imagePullSecrets" -}}
+{{ include "common.images.pullSecrets" (dict "imageRoot" .Values.kubectl.image "global" .Values.global) }}
+{{- end -}}
+
 {{- define "karmada.controllerManager.featureGates" -}}
      {{- if (not (empty .Values.controllerManager.featureGates)) }}
           {{- $featureGatesFlag := "" -}}
