@@ -16835,6 +16835,36 @@
         }
       }
     },
+    "com.github.karmada-io.karmada.pkg.apis.policy.v1alpha1.FieldOverrider": {
+      "description": "FieldOverrider represents the rules dedicated to modifying a specific field in any Kubernetes resource. This allows changing a single field within the resource with multiple operations. It is designed to handle structured field values such as those found in ConfigMaps or Secrets. The current implementation supports JSON and YAML formats, but can easily be extended to support XML in the future. Note: In any given instance, FieldOverrider processes either JSON or YAML fields, but not both simultaneously.",
+      "type": "object",
+      "required": [
+        "fieldPath"
+      ],
+      "properties": {
+        "fieldPath": {
+          "description": "FieldPath specifies the initial location in the instance document where the operation should take place. The path uses RFC 6901 for navigating into nested structures. For example, the path \"/data/db-config.yaml\" specifies the configuration data key named \"db-config.yaml\" in a ConfigMap: \"/data/db-config.yaml\".",
+          "type": "string",
+          "default": ""
+        },
+        "json": {
+          "description": "JSON represents the operations performed on the JSON document specified by the FieldPath.",
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/com.github.karmada-io.karmada.pkg.apis.policy.v1alpha1.JSONPatchOperation"
+          }
+        },
+        "yaml": {
+          "description": "YAML represents the operations performed on the YAML document specified by the FieldPath.",
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/com.github.karmada-io.karmada.pkg.apis.policy.v1alpha1.YAMLPatchOperation"
+          }
+        }
+      }
+    },
     "com.github.karmada-io.karmada.pkg.apis.policy.v1alpha1.FieldSelector": {
       "description": "FieldSelector is a field filter.",
       "type": "object",
@@ -16888,6 +16918,30 @@
           "description": "Path indicates the path of target field",
           "type": "string",
           "default": ""
+        }
+      }
+    },
+    "com.github.karmada-io.karmada.pkg.apis.policy.v1alpha1.JSONPatchOperation": {
+      "description": "JSONPatchOperation represents a single field modification operation for JSON format.",
+      "type": "object",
+      "required": [
+        "subPath",
+        "operator"
+      ],
+      "properties": {
+        "operator": {
+          "description": "Operator indicates the operation on target field. Available operators are: \"add\", \"remove\", and \"replace\".",
+          "type": "string",
+          "default": ""
+        },
+        "subPath": {
+          "description": "SubPath specifies the relative location within the initial FieldPath where the operation should take place. The path uses RFC 6901 for navigating into nested structures.",
+          "type": "string",
+          "default": ""
+        },
+        "value": {
+          "description": "Value is the new value to set for the specified field if the operation is \"add\" or \"replace\". For \"remove\" operation, this field is ignored.",
+          "$ref": "#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSON"
         }
       }
     },
@@ -17014,7 +17068,7 @@
       }
     },
     "com.github.karmada-io.karmada.pkg.apis.policy.v1alpha1.Overriders": {
-      "description": "Overriders offers various alternatives to represent the override rules.\n\nIf more than one alternative exists, they will be applied with following order: - ImageOverrider - CommandOverrider - ArgsOverrider - LabelsOverrider - AnnotationsOverrider - Plaintext",
+      "description": "Overriders offers various alternatives to represent the override rules.\n\nIf more than one alternative exists, they will be applied with following order: - ImageOverrider - CommandOverrider - ArgsOverrider - LabelsOverrider - AnnotationsOverrider - FieldOverrider - Plaintext",
       "type": "object",
       "properties": {
         "annotationsOverrider": {
@@ -17039,6 +17093,14 @@
           "items": {
             "default": {},
             "$ref": "#/definitions/com.github.karmada-io.karmada.pkg.apis.policy.v1alpha1.CommandArgsOverrider"
+          }
+        },
+        "fieldOverrider": {
+          "description": "FieldOverrider represents the rules dedicated to modifying a specific field in any Kubernetes resource. This allows changing a single field within the resource with multiple operations. It is designed to handle structured field values such as those found in ConfigMaps or Secrets. The current implementation supports JSON and YAML formats, but can easily be extended to support XML in the future.",
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/com.github.karmada-io.karmada.pkg.apis.policy.v1alpha1.FieldOverrider"
           }
         },
         "imageOverrider": {
@@ -17401,6 +17463,205 @@
         }
       }
     },
+<<<<<<< HEAD
+=======
+    "com.github.karmada-io.karmada.pkg.apis.policy.v1alpha1.SuspendClusters": {
+      "description": "SuspendClusters represents a group of clusters that should be suspended from propagating. Note: No plan to introduce the label selector or field selector to select clusters yet, as it would make the system unpredictable.",
+      "type": "object",
+      "properties": {
+        "clusterNames": {
+          "description": "ClusterNames is the list of clusters to be selected.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "default": ""
+          }
+        }
+      }
+    },
+    "com.github.karmada-io.karmada.pkg.apis.policy.v1alpha1.Suspension": {
+      "description": "Suspension defines the policy for suspending different aspects of propagation.",
+      "type": "object",
+      "properties": {
+        "dispatching": {
+          "description": "Dispatching controls whether dispatching should be suspended. nil means not suspend, no default value, only accepts 'true'. Note: true means stop propagating to all clusters. Can not co-exist with DispatchingOnClusters which is used to suspend particular clusters.",
+          "type": "boolean"
+        },
+        "dispatchingOnClusters": {
+          "description": "DispatchingOnClusters declares a list of clusters to which the dispatching should be suspended. Note: Can not co-exist with Dispatching which is used to suspend all.",
+          "$ref": "#/definitions/com.github.karmada-io.karmada.pkg.apis.policy.v1alpha1.SuspendClusters"
+        }
+      }
+    },
+    "com.github.karmada-io.karmada.pkg.apis.policy.v1alpha1.YAMLPatchOperation": {
+      "description": "YAMLPatchOperation represents a single field modification operation for YAML format.",
+      "type": "object",
+      "required": [
+        "subPath",
+        "operator"
+      ],
+      "properties": {
+        "operator": {
+          "description": "Operator indicates the operation on target field. Available operators are: \"add\", \"remove\", and \"replace\".",
+          "type": "string",
+          "default": ""
+        },
+        "subPath": {
+          "description": "SubPath specifies the relative location within the initial FieldPath where the operation should take place. The path uses RFC 6901 for navigating into nested structures.",
+          "type": "string",
+          "default": ""
+        },
+        "value": {
+          "description": "Value is the new value to set for the specified field if the operation is \"add\" or \"replace\". For \"remove\" operation, this field is ignored.",
+          "$ref": "#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSON"
+        }
+      }
+    },
+    "com.github.karmada-io.karmada.pkg.apis.remedy.v1alpha1.ClusterAffinity": {
+      "description": "ClusterAffinity represents the filter to select clusters.",
+      "type": "object",
+      "properties": {
+        "clusterNames": {
+          "description": "ClusterNames is the list of clusters to be selected.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "default": ""
+          }
+        }
+      }
+    },
+    "com.github.karmada-io.karmada.pkg.apis.remedy.v1alpha1.ClusterConditionRequirement": {
+      "description": "ClusterConditionRequirement describes the Cluster condition requirement details.",
+      "type": "object",
+      "required": [
+        "conditionType",
+        "operator",
+        "conditionStatus"
+      ],
+      "properties": {
+        "conditionStatus": {
+          "description": "ConditionStatus specifies the ClusterStatue condition status.",
+          "type": "string",
+          "default": ""
+        },
+        "conditionType": {
+          "description": "ConditionType specifies the ClusterStatus condition type.",
+          "type": "string",
+          "default": ""
+        },
+        "operator": {
+          "description": "Operator represents a conditionType's relationship to a conditionStatus. Valid operators are Equal, NotEqual.",
+          "type": "string",
+          "default": ""
+        }
+      }
+    },
+    "com.github.karmada-io.karmada.pkg.apis.remedy.v1alpha1.DecisionMatch": {
+      "description": "DecisionMatch represents the decision match detail of activating the remedy system.",
+      "type": "object",
+      "properties": {
+        "clusterConditionMatch": {
+          "description": "ClusterConditionMatch describes the cluster condition requirement.",
+          "$ref": "#/definitions/com.github.karmada-io.karmada.pkg.apis.remedy.v1alpha1.ClusterConditionRequirement"
+        }
+      }
+    },
+    "com.github.karmada-io.karmada.pkg.apis.remedy.v1alpha1.Remedy": {
+      "description": "Remedy represents the cluster-level management strategies based on cluster conditions.",
+      "type": "object",
+      "required": [
+        "spec"
+      ],
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "default": {},
+          "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+        },
+        "spec": {
+          "description": "Spec represents the desired behavior of Remedy.",
+          "default": {},
+          "$ref": "#/definitions/com.github.karmada-io.karmada.pkg.apis.remedy.v1alpha1.RemedySpec"
+        }
+      },
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "remedy.karmada.io",
+          "kind": "Remedy",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "com.github.karmada-io.karmada.pkg.apis.remedy.v1alpha1.RemedyList": {
+      "description": "RemedyList contains a list of Remedy.",
+      "type": "object",
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/com.github.karmada-io.karmada.pkg.apis.remedy.v1alpha1.Remedy"
+          }
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "default": {},
+          "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+        }
+      },
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "remedy.karmada.io",
+          "kind": "RemedyList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "com.github.karmada-io.karmada.pkg.apis.remedy.v1alpha1.RemedySpec": {
+      "description": "RemedySpec represents the desired behavior of Remedy.",
+      "type": "object",
+      "properties": {
+        "actions": {
+          "description": "Actions specifies the actions that remedy system needs to perform. If empty, no action will be performed.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "default": ""
+          }
+        },
+        "clusterAffinity": {
+          "description": "ClusterAffinity specifies the clusters that Remedy needs to pay attention to. For clusters that meet the DecisionConditions, Actions will be preformed. If empty, all clusters will be selected.",
+          "$ref": "#/definitions/com.github.karmada-io.karmada.pkg.apis.remedy.v1alpha1.ClusterAffinity"
+        },
+        "decisionMatches": {
+          "description": "DecisionMatches indicates the decision matches of triggering the remedy system to perform the actions. As long as any one DecisionMatch matches, the Actions will be preformed. If empty, the Actions will be performed immediately.",
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/com.github.karmada-io.karmada.pkg.apis.remedy.v1alpha1.DecisionMatch"
+          }
+        }
+      }
+    },
+>>>>>>> 8ad4b5a98 (Proposing structured field overrider API)
     "com.github.karmada-io.karmada.pkg.apis.search.v1alpha1.BackendStoreConfig": {
       "description": "BackendStoreConfig specifies backend store.",
       "type": "object",

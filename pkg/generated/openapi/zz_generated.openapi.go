@@ -105,9 +105,11 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.FederatedResourceQuotaList":                  schema_pkg_apis_policy_v1alpha1_FederatedResourceQuotaList(ref),
 		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.FederatedResourceQuotaSpec":                  schema_pkg_apis_policy_v1alpha1_FederatedResourceQuotaSpec(ref),
 		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.FederatedResourceQuotaStatus":                schema_pkg_apis_policy_v1alpha1_FederatedResourceQuotaStatus(ref),
+		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.FieldOverrider":                              schema_pkg_apis_policy_v1alpha1_FieldOverrider(ref),
 		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.FieldSelector":                               schema_pkg_apis_policy_v1alpha1_FieldSelector(ref),
 		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.ImageOverrider":                              schema_pkg_apis_policy_v1alpha1_ImageOverrider(ref),
 		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.ImagePredicate":                              schema_pkg_apis_policy_v1alpha1_ImagePredicate(ref),
+		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.JSONPatchOperation":                          schema_pkg_apis_policy_v1alpha1_JSONPatchOperation(ref),
 		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.LabelAnnotationOverrider":                    schema_pkg_apis_policy_v1alpha1_LabelAnnotationOverrider(ref),
 		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.OverridePolicy":                              schema_pkg_apis_policy_v1alpha1_OverridePolicy(ref),
 		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.OverridePolicyList":                          schema_pkg_apis_policy_v1alpha1_OverridePolicyList(ref),
@@ -124,6 +126,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.SpreadConstraint":                            schema_pkg_apis_policy_v1alpha1_SpreadConstraint(ref),
 		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.StaticClusterAssignment":                     schema_pkg_apis_policy_v1alpha1_StaticClusterAssignment(ref),
 		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.StaticClusterWeight":                         schema_pkg_apis_policy_v1alpha1_StaticClusterWeight(ref),
+		"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.YAMLPatchOperation":                          schema_pkg_apis_policy_v1alpha1_YAMLPatchOperation(ref),
 		"github.com/karmada-io/karmada/pkg/apis/search/v1alpha1.BackendStoreConfig":                          schema_pkg_apis_search_v1alpha1_BackendStoreConfig(ref),
 		"github.com/karmada-io/karmada/pkg/apis/search/v1alpha1.OpenSearchConfig":                            schema_pkg_apis_search_v1alpha1_OpenSearchConfig(ref),
 		"github.com/karmada-io/karmada/pkg/apis/search/v1alpha1.Proxying":                                    schema_pkg_apis_search_v1alpha1_Proxying(ref),
@@ -3905,6 +3908,58 @@ func schema_pkg_apis_policy_v1alpha1_FederatedResourceQuotaStatus(ref common.Ref
 	}
 }
 
+func schema_pkg_apis_policy_v1alpha1_FieldOverrider(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "FieldOverrider represents the rules dedicated to modifying a specific field in any Kubernetes resource. This allows changing a single field within the resource with multiple operations. It is designed to handle structured field values such as those found in ConfigMaps or Secrets. The current implementation supports JSON and YAML formats, but can easily be extended to support XML in the future. Note: In any given instance, FieldOverrider processes either JSON or YAML fields, but not both simultaneously.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"fieldPath": {
+						SchemaProps: spec.SchemaProps{
+							Description: "FieldPath specifies the initial location in the instance document where the operation should take place. The path uses RFC 6901 for navigating into nested structures. For example, the path \"/data/db-config.yaml\" specifies the configuration data key named \"db-config.yaml\" in a ConfigMap: \"/data/db-config.yaml\".",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"json": {
+						SchemaProps: spec.SchemaProps{
+							Description: "JSON represents the operations performed on the JSON document specified by the FieldPath.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.JSONPatchOperation"),
+									},
+								},
+							},
+						},
+					},
+					"yaml": {
+						SchemaProps: spec.SchemaProps{
+							Description: "YAML represents the operations performed on the YAML document specified by the FieldPath.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.YAMLPatchOperation"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"fieldPath"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.JSONPatchOperation", "github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.YAMLPatchOperation"},
+	}
+}
+
 func schema_pkg_apis_policy_v1alpha1_FieldSelector(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3998,6 +4053,45 @@ func schema_pkg_apis_policy_v1alpha1_ImagePredicate(ref common.ReferenceCallback
 				Required: []string{"path"},
 			},
 		},
+	}
+}
+
+func schema_pkg_apis_policy_v1alpha1_JSONPatchOperation(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "JSONPatchOperation represents a single field modification operation for JSON format.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"subPath": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SubPath specifies the relative location within the initial FieldPath where the operation should take place. The path uses RFC 6901 for navigating into nested structures.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"operator": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Operator indicates the operation on target field. Available operators are: \"add\", \"remove\", and \"replace\".",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"value": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Value is the new value to set for the specified field if the operation is \"add\" or \"replace\". For \"remove\" operation, this field is ignored.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1.JSON"),
+						},
+					},
+				},
+				Required: []string{"subPath", "operator"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1.JSON"},
 	}
 }
 
@@ -4192,7 +4286,7 @@ func schema_pkg_apis_policy_v1alpha1_Overriders(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Overriders offers various alternatives to represent the override rules.\n\nIf more than one alternative exists, they will be applied with following order: - ImageOverrider - CommandOverrider - ArgsOverrider - LabelsOverrider - AnnotationsOverrider - Plaintext",
+				Description: "Overriders offers various alternatives to represent the override rules.\n\nIf more than one alternative exists, they will be applied with following order: - ImageOverrider - CommandOverrider - ArgsOverrider - LabelsOverrider - AnnotationsOverrider - FieldOverrider - Plaintext",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"plaintext": {
@@ -4279,11 +4373,25 @@ func schema_pkg_apis_policy_v1alpha1_Overriders(ref common.ReferenceCallback) co
 							},
 						},
 					},
+					"fieldOverrider": {
+						SchemaProps: spec.SchemaProps{
+							Description: "FieldOverrider represents the rules dedicated to modifying a specific field in any Kubernetes resource. This allows changing a single field within the resource with multiple operations. It is designed to handle structured field values such as those found in ConfigMaps or Secrets. The current implementation supports JSON and YAML formats, but can easily be extended to support XML in the future.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.FieldOverrider"),
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.CommandArgsOverrider", "github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.ImageOverrider", "github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.LabelAnnotationOverrider", "github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.PlaintextOverrider"},
+			"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.CommandArgsOverrider", "github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.FieldOverrider", "github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.ImageOverrider", "github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.LabelAnnotationOverrider", "github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.PlaintextOverrider"},
 	}
 }
 
@@ -4819,6 +4927,45 @@ func schema_pkg_apis_policy_v1alpha1_StaticClusterWeight(ref common.ReferenceCal
 		},
 		Dependencies: []string{
 			"github.com/karmada-io/karmada/pkg/apis/policy/v1alpha1.ClusterAffinity"},
+	}
+}
+
+func schema_pkg_apis_policy_v1alpha1_YAMLPatchOperation(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "YAMLPatchOperation represents a single field modification operation for YAML format.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"subPath": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SubPath specifies the relative location within the initial FieldPath where the operation should take place. The path uses RFC 6901 for navigating into nested structures.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"operator": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Operator indicates the operation on target field. Available operators are: \"add\", \"remove\", and \"replace\".",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"value": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Value is the new value to set for the specified field if the operation is \"add\" or \"replace\". For \"remove\" operation, this field is ignored.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1.JSON"),
+						},
+					},
+				},
+				Required: []string{"subPath", "operator"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1.JSON"},
 	}
 }
 
