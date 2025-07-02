@@ -629,6 +629,8 @@ etcd:
     servers: ""
     ## @param etcd.external.registryPrefix use to registry prefix of etcd
     registryPrefix: "/registry/karmada"
+    ## @param etcd.external.tlsMode "enable" and "disable" are provided
+    tlsMode: "disable"
     certs:
       ## @param etcd.external.certs.caCrt ca of the certificate
       caCrt: |
