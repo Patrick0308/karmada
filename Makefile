@@ -1,6 +1,6 @@
 GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
-VERSION ?= '$(shell hack/version.sh)'
+VERSION ?= $(shell hack/version.sh)
 
 # Images management
 REGISTRY?="docker.io/karmada"
@@ -99,8 +99,8 @@ package-chart:
 
 .PHONY: push-chart
 push-chart:
-	helm push _output/charts/karmada-chart-${VERSION}.tgz oci://docker.io/karmada
-	helm push _output/charts/karmada-operator-chart-${VERSION}.tgz oci://docker.io/karmada
+	helm push _output/charts/karmada-chart-${VERSION}.tgz oci://docker.longbridge-inc.com/lb-public/karmada-chart:hk-${VERSION}
+	helm push _output/charts/karmada-operator-chart-${VERSION}.tgz oci://docker.longbridge-inc.com/lb-public/karmada-chart:hk-${VERSION}
 
 COLOR_GOTEST_REGISTRY:=github.com/rakyll/gotest
 COLOR_GOTEST_VERSION:=aeb9f1f4739020c60963f21eec2e65672307a9ac
