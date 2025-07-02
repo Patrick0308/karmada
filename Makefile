@@ -3,7 +3,7 @@ GOARCH ?= $(shell go env GOARCH)
 VERSION ?= $(shell hack/version.sh)
 
 # Images management
-REGISTRY?="docker.longbridge-inc.com/lb-public"
+REGISTRY?="docker.longbridge-inc.com/lb-public/karmada"
 REGISTRY_USER_NAME?=""
 REGISTRY_PASSWORD?=""
 REGISTRY_SERVER_ADDRESS?=""
