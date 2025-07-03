@@ -1,6 +1,6 @@
 GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
-VERSION ?= $(shell hack/version.sh)
+VERSION ?= $(shell hack/version.sh)+hk
 
 # Images management
 REGISTRY?="docker.longbridge-inc.com/lb-public/karmada"
