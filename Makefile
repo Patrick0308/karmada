@@ -1,12 +1,14 @@
 GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
-VERSION ?= $(shell hack/version.sh)+hk
+VERSION ?= $(shell hack/version.sh)
 
 # Images management
 REGISTRY?="docker.longbridge-inc.com/lb-public/karmada"
 REGISTRY_USER_NAME?=""
 REGISTRY_PASSWORD?=""
 REGISTRY_SERVER_ADDRESS?=""
+HELM_REGISTRY_USER_NAME?=""
+HELM_REGISTRY_PASSWORD?=""
 
 TARGETS := karmada-aggregated-apiserver \
 			karmada-controller-manager \
@@ -99,8 +101,11 @@ package-chart:
 
 .PHONY: push-chart
 push-chart:
-	helm push _output/charts/karmada-chart-${VERSION}.tgz oci://docker.longbridge-inc.com/lb-public/karmada-chart
-	helm push _output/charts/karmada-operator-chart-${VERSION}.tgz oci://docker.longbridge-inc.com/lb-public/karmada-chart
+ifneq ($(HELM_REGISTRY_USER_NAME), "")
+	helm registry login registry-lb-hk-registry.cn-hongkong.cr.aliyuncs.com --username ${HELM_REGISTRY_USER_NAME} --password ${HELM_REGISTRY_PASSWORD}
+endif
+	helm push _output/charts/karmada-chart-${VERSION}.tgz oci://registry-lb-hk-registry.cn-hongkong.cr.aliyuncs.com/lb-public/karmada-chart
+	helm push _output/charts/karmada-operator-chart-${VERSION}.tgz oci://registry-lb-hk-registry.cn-hongkong.cr.aliyuncs.com/lb-public/karmada-chart
 
 COLOR_GOTEST_REGISTRY:=github.com/rakyll/gotest
 COLOR_GOTEST_VERSION:=aeb9f1f4739020c60963f21eec2e65672307a9ac
