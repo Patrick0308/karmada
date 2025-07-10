@@ -44,12 +44,12 @@ for chart in ${KARMADA_CHARTS[@]};
 do
     sed -i'' -e "s/\&karmadaImageVersion .*/\&karmadaImageVersion hk-${version}/g" ./charts/"${chart}"/values.yaml
 
-    tar_file="${chart}-chart-${version}.tgz"
+    tar_file="${chart}-chart-${version}+hk.tgz"
     echo "Starting to package into a ${chart} chart archive"
-    helm package ./charts/"${chart}" --version "${version}" -d "${output_dir}" -u
+    helm package ./charts/"${chart}" --version "${version}+hk" -d "${output_dir}" -u
 
-    echo "Rename ${chart}-${version}.tgz to ${tar_file}"
-    mv "${output_dir}/${chart}-${version}.tgz" "${output_dir}/${tar_file}"
+    echo "Rename ${chart}-${version}+hk.tgz to ${tar_file}"
+    mv "${output_dir}/${chart}-${version}+hk.tgz" "${output_dir}/${tar_file}"
 
     sha256sum "${output_dir}/${tar_file}" > "${output_dir}/${tar_file}.sha256"
 done

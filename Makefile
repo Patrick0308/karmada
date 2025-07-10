@@ -97,7 +97,7 @@ verify:
 
 .PHONY: package-chart
 package-chart:
-	hack/package-helm-chart.sh $(VERSION)+hk
+	hack/package-helm-chart.sh $(VERSION)
 
 .PHONY: push-chart
 push-chart:
