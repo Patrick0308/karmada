@@ -2,6 +2,10 @@
 include:
 - https://git.5th.im/lb-public/ci-template/raw/master/ci.yaml
 
+stages:
+  - build
+  - push
+
 ## push canary
 push_chart_canary:
   stage: push
