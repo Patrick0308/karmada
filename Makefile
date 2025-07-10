@@ -97,15 +97,12 @@ verify:
 
 .PHONY: package-chart
 package-chart:
-	hack/package-helm-chart.sh $(VERSION)
+	hack/package-helm-chart.sh $(VERSION)+hk
 
 .PHONY: push-chart
 push-chart:
-ifneq ($(HELM_REGISTRY_USER_NAME), "")
-	helm registry login registry-lb-hk-registry.cn-hongkong.cr.aliyuncs.com --username ${HELM_REGISTRY_USER_NAME} --password ${HELM_REGISTRY_PASSWORD}
-endif
-	helm push _output/charts/karmada-chart-${VERSION}.tgz oci://registry-lb-hk-registry.cn-hongkong.cr.aliyuncs.com/lb-public/karmada-chart
-	helm push _output/charts/karmada-operator-chart-${VERSION}.tgz oci://registry-lb-hk-registry.cn-hongkong.cr.aliyuncs.com/lb-public/karmada-chart
+	helm push _output/charts/karmada-chart-${VERSION}+hk.tgz oci://docker.longbridge-inc.com/lb-public/karmada-chart
+	helm push _output/charts/karmada-operator-chart-${VERSION}+hk.tgz oci://docker.longbridge-inc.com/lb-public/karmada-chart
 
 COLOR_GOTEST_REGISTRY:=github.com/rakyll/gotest
 COLOR_GOTEST_VERSION:=aeb9f1f4739020c60963f21eec2e65672307a9ac
