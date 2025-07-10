@@ -1,0 +1,17 @@
+
+include:
+- https://git.5th.im/lb-public/ci-template/raw/master/ci.yaml
+
+## push canary
+push_chart_canary:
+  extends: .docker-login
+  script:
+  - helm registry login ${Harbor_Host} -u ${Harbor_UserName} -p ${Harbor_Password}
+  - make package-chart push-chart
+
+
+push_chart_prod:
+  extends: .docker-login
+  script:
+  - helm registry login ${Harbor_Host} -u ${Harbor_UserName} -p ${Harbor_Password}
+  - make package-chart push-chart
