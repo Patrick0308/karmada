@@ -11,7 +11,8 @@ push_chart_canary:
   stage: push
   extends: .docker-login
   script:
-  - apk update && apk add helm --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community
+  - apk update && apk add -X https://dl-cdn.alpinelinux.org/alpine/v3.16/main -u alpine-keys
+  - apk add helm --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community
   - helm registry login ${Harbor_Host} -u ${Harbor_UserName} -p ${Harbor_Password}
   - make package-chart push-chart
 
@@ -20,6 +21,7 @@ push_chart_prod:
   stage: push
   extends: .docker-login
   script:
-  - apk update && apk add helm --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community
+  - apk update && apk add -X https://dl-cdn.alpinelinux.org/alpine/v3.16/main -u alpine-keys
+  - apk add helm --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community
   - helm registry login ${Harbor_Host} -u ${Harbor_UserName} -p ${Harbor_Password}
   - make package-chart push-chart
