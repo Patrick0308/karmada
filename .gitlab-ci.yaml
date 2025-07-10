@@ -4,6 +4,7 @@ include:
 
 ## push canary
 push_chart_canary:
+  stage: push
   extends: .docker-login
   script:
   - helm registry login ${Harbor_Host} -u ${Harbor_UserName} -p ${Harbor_Password}
@@ -11,6 +12,7 @@ push_chart_canary:
 
 
 push_chart_prod:
+  stage: push
   extends: .docker-login
   script:
   - helm registry login ${Harbor_Host} -u ${Harbor_UserName} -p ${Harbor_Password}
