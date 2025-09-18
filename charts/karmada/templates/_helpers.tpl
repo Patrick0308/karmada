@@ -111,7 +111,8 @@ app: {{- include "karmada.name" .}}-kube-controller-manager
 {{- end -}}
 
 {{- define "karmada.postUpgradeJob.labels" -}}
-{- end -}}
+{{- include "karmada.commonLabels" . -}}
+{{- end -}}
 
 {{- define "karmada.kubeconfig.volume" -}}
 {{- $name := include "karmada.name" . -}}
