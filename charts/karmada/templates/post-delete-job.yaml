@@ -7,7 +7,7 @@ metadata:
   name: "{{ $name }}-post-delete"
   namespace: {{ $namespace }}
   labels:
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    helm.sh/chart: {{ include "karmada.chart" . | quote }}
     {{- include "karmada.postDeleteJob.labels" . | nindent 4 }}
   annotations:
     # This is what defines this resource as a hook. Without this line, the
@@ -22,7 +22,7 @@ spec:
     metadata:
       name: {{ $name }}
       labels:
-        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        helm.sh/chart: {{ include "karmada.chart" . | quote }}
     spec:
       {{- include "karmada.kubectl.imagePullSecrets" . | nindent 6 }}
       {{- with .Values.postDeleteJob.tolerations}}

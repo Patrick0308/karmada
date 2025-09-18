@@ -111,8 +111,7 @@ app: {{- include "karmada.name" .}}-kube-controller-manager
 {{- end -}}
 
 {{- define "karmada.postUpgradeJob.labels" -}}
-{{- include "karmada.commonLabels" . -}}
-{{- end -}}
+{- end -}}
 
 {{- define "karmada.kubeconfig.volume" -}}
 {{- $name := include "karmada.name" . -}}
@@ -578,3 +577,10 @@ Return the proper karmada kubectl and cfssl image pullSecrets
 {{- end }}
 {{- end }}
 {{- end -}}
+
+{{/*
+Create chart name and version as used by the chart label.
+*/}}
+{{- define "karmada.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
