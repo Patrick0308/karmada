@@ -8,6 +8,8 @@ stages:
 push_chart:
   stage: push
   extends: .docker-login
+  only:
+    - /^(release)-.+$/
   script:
   - apk update && apk add -X https://dl-cdn.alpinelinux.org/alpine/v3.16/main -u alpine-keys
   - apk add helm --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community
@@ -17,6 +19,8 @@ push_chart:
 
 push_images:
   stage: push
+  only:
+    - /^(release)-.+$/
   extends: .docker-login
   script:
   - apk update && apk add -X https://dl-cdn.alpinelinux.org/alpine/v3.16/main -u alpine-keys
