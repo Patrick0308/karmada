@@ -75,6 +75,18 @@ spec:
             - --tls-private-key-file=/etc/kubernetes/pki/karmada.key
             - --max-requests-inflight={{ .Values.apiServer.maxRequestsInflight }}
             - --max-mutating-requests-inflight={{ .Values.apiServer.maxMutatingRequestsInflight }}
+            {{- if ne .Values.apiServer.oidc.issuerUrl "" }}
+            - --oidc-issuer-url={{ .Values.apiServer.oidc.issuerUrl }}
+            {{- end }}
+            {{- if ne .Values.apiServer.oidc.clientId "" }}
+            - --oidc-client-id={{ .Values.apiServer.oidc.clientId }}
+            {{- end }}
+            {{- if ne .Values.apiServer.oidc.usernameClaim "" }}
+            - --oidc-username-claim={{ .Values.apiServer.oidc.usernameClaim }}
+            {{- end }}
+            {{- if ne .Values.apiServer.oidc.groupsClaim "" }}
+            - --oidc-groups-claim={{ .Values.apiServer.oidc.groupsClaim }}
+            {{- end }}
             - --tls-min-version=VersionTLS13
           ports:
             - name: http

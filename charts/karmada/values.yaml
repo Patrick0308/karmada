@@ -414,6 +414,16 @@ apiServer:
   nodePort: 0
   maxRequestsInflight: 1500
   maxMutatingRequestsInflight: 500
+  ## @param apiServer.oidc OIDC configuration for the API server
+  oidc:
+    ## @param apiServer.oidc.issuerUrl OIDC issuer URL
+    issuerUrl: ""
+    ## @param apiServer.oidc.clientId OIDC client ID
+    clientId: ""
+    ## @param apiServer.oidc.usernameClaim OIDC username claim
+    usernameClaim: ""
+    ## @param apiServer.oidc.groupsClaim OIDC groups claim
+    groupsClaim: ""
   ## @param apiserver.strategy strategy of the apiserver
   strategy:
     type: RollingUpdate

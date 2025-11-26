@@ -40,9 +40,12 @@ else
 fi
 
 tar_file=""
-for chart in ${KARMADA_CHARTS[@]}; 
+for chart in ${KARMADA_CHARTS[@]};
 do
-    sed -i'' -e "s/\&karmadaImageVersion .*/\&karmadaImageVersion hk-${version}/g" ./charts/"${chart}"/values.yaml
+    # Create a backup of the values.yaml file
+    cp ./charts/"${chart}"/values.yaml ./charts/"${chart}"/values.yaml.backup
+
+    sed -i '' -e "s/\&karmadaImageVersion .*/\&karmadaImageVersion hk-${version}/g" ./charts/"${chart}"/values.yaml
 
     tar_file="${chart}-chart-${version}+hk.tgz"
     echo "Starting to package into a ${chart} chart archive"
@@ -52,5 +55,9 @@ do
     mv "${output_dir}/${chart}-${version}+hk.tgz" "${output_dir}/${tar_file}"
 
     sha256sum "${output_dir}/${tar_file}" > "${output_dir}/${tar_file}.sha256"
+
+    # Restore the original values.yaml from backup
+    echo "Restoring original values.yaml for ${chart}"
+    mv ./charts/"${chart}"/values.yaml.backup ./charts/"${chart}"/values.yaml
 done
 
