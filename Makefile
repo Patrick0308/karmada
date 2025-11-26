@@ -60,7 +60,7 @@ $(IMAGE_TARGET):
 	set -e;\
 	target=$$(echo $(subst image-,,$@));\
 	make $$target GOOS=linux;\
-	VERSION=$(VERSION) REGISTRY=$(REGISTRY) BUILD_PLATFORMS=linux/$(GOARCH) hack/docker.sh $$target
+	VERSION=hk-$(VERSION) REGISTRY=$(REGISTRY) BUILD_PLATFORMS=linux/$(GOARCH) hack/docker.sh $$target
 
 images: $(IMAGE_TARGET)
 

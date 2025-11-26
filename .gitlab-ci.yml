@@ -1,13 +1,11 @@
 
 include:
-- https://git.5th.im/lb-public/ci-template/raw/master/ci.yaml
+- https://gitlab.longbridge-inc.com/lb-public/ci-template/raw/master/ci.yaml
 
 stages:
-  - build
   - push
 
-## push canary
-push_chart_canary:
+push_chart:
   stage: push
   extends: .docker-login
   script:
@@ -17,11 +15,10 @@ push_chart_canary:
   - make package-chart push-chart
 
 
-push_chart_prod:
+push_images:
   stage: push
   extends: .docker-login
   script:
   - apk update && apk add -X https://dl-cdn.alpinelinux.org/alpine/v3.16/main -u alpine-keys
   - apk add helm --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community
-  - helm registry login ${Harbor_Host} -u ${Harbor_UserName} -p ${Harbor_Password}
-  - make package-chart push-chart
+  - make images
